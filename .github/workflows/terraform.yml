@@ -76,22 +76,20 @@ jobs:
           USER_NAME   : ${{ secrets.EC2_USER  }}
       run: |
         ec2_public_ip=`aws --region us-east-1 ec2 describe-instances  --filters "Name= tag:Name,Values=Terraform-Instance" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text`
-        export PUBLICIP=$ec2_public_ip
-        echo "::set-env name=PUBLICIP::$PUBLICIP"
         echo "$PRIVATE_KEY" > ${{ secrets.EC2_PRIVATE_KEY_NAME  }} && chmod 400 ${{ secrets.EC2_PRIVATE_KEY_NAME  }}
         ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY_NAME  }} ${USER_NAME}@${ec2_public_ip} '
         WORKING_DIR=${{ secrets.DIR_PATH_OF_SCRIPTS  }}
         if [ -d "$WORKING_DIR" ]; then rm -Rf $WORKING_DIR; fi
         '
   
-    - name: Copy Script files
-      env:
-          PRIVATE_KEY : ${{ secrets.EC2_PRIVATE_KEY  }}
-          USER_NAME   : ${{ secrets.EC2_USER  }}
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY_NAME  }} ${USER_NAME}@${ec2_public_ip} '
-        scp -i ${{ secrets.EC2_PRIVATE_KEY_NAME  }} scripts ${USER_NAME}@$PUBLICIP:scripts
-        '
+    - name: Copy Script files via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: 3.239.45.46
+        username: ${{ secrets.EC2_USER  }}
+        key: ${{ secrets.EC2_PRIVATE_KEY  }}
+        source: "scripts/jfrog-script.sh"
+        target: "."
    
     
     - name: Deploy Jfrog Script in Jfrog EC2 Instance
