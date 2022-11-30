@@ -85,7 +85,7 @@ jobs:
     - name: Copy Script files via ssh password
       uses: appleboy/scp-action@master
       with:
-        host: aws --region us-east-1 ec2 describe-instances  --filters "Name= tag:Name,Values=Terraform-Instance" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text                
+        host: ${aws --region us-east-1 ec2 describe-instances  --filters "Name= tag:Name,Values=Terraform-Instance" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text}              
         username: ${{ secrets.EC2_USER  }}
         key: ${{ secrets.EC2_PRIVATE_KEY  }}
         source: "scripts/nginx.sh"
