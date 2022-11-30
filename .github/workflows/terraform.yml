@@ -82,14 +82,15 @@ jobs:
         if [ -d "$WORKING_DIR" ]; then rm -Rf $WORKING_DIR; fi
         '
   
-    - name: Copy Script files via ssh password
-      uses: appleboy/scp-action@master
-      with:
-        host: $ec2_public_ip
-        username: ${{ secrets.EC2_USER  }}
-        key: ${{ secrets.EC2_PRIVATE_KEY  }}
-        source: "scripts/nginx.sh"
-        target: "."
+    - name: Copy Script files
+      env:
+          PRIVATE_KEY : ${{ secrets.EC2_PRIVATE_KEY  }}
+          USER_NAME   : ${{ secrets.EC2_USER  }}
+      run: |
+        ec2_public_ip=`aws --region us-east-1 ec2 describe-instances  --filters "Name= tag:Name,Values=Terraform-Instance" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text`
+        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_PRIVATE_KEY_NAME  }} ${USER_NAME}@${ec2_public_ip} '
+        scp -i ${{ secrets.EC2_PRIVATE_KEY_NAME  }} scripts ${USER_NAME}@${ec2_public_ip}:scripts
+        '
    
     
     - name: Deploy Jfrog Script in Jfrog EC2 Instance
