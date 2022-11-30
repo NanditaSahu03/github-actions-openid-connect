@@ -92,7 +92,7 @@ jobs:
         target: "."
    
     
-    - name: Deploy Jfrog Script in Jfrog EC2 Instance
+    - name: Deploy Nginx Script in Terraform EC2 Instance
       env:
           PRIVATE_KEY : ${{ secrets.EC2_PRIVATE_KEY  }}
           USER_NAME   : ${{ secrets.EC2_USER  }}
