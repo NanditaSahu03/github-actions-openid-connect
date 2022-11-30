@@ -12,8 +12,8 @@ resource "aws_security_group" "allow_sg" {
   
    ingress {
     description      = "TLS from VPC"
-    from_port        = 8082
-    to_port          = 8082
+    from_port        = 8080
+    to_port          = 8080
     protocol         = "tcp"
     cidr_blocks      = ["157.35.3.5/32"]
   }
